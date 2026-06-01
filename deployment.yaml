@@ -55,11 +55,11 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
 
       containers:
-        - name: myapp
-          image: kubetrain-aks.azurecr.io/myapp:1.0.0
+        - name: chachaslide
+          image: kubetrain.azurecr.io/chachaslide:2.0.0
 
           ports:
-            - containerPort: 5000
+            - containerPort: 8000
 
           # ✅ Use ConfigMap
           env:
@@ -74,20 +74,11 @@ spec:
                   name: chachaslide-config
                   key: APP_MESSAGE
 
-          # Resources (important in real clusters), prevents one container from using all CPU/Memory
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
-
           # Liveness probe (is app alive?)
           livenessProbe:
             httpGet:
               path: /health
-              port: 5000
+              port: 8000
             initialDelaySeconds: 10
             periodSeconds: 10
 
@@ -95,7 +86,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: 5000
+              port: 8000
             initialDelaySeconds: 5
             periodSeconds: 5
 
@@ -114,7 +105,7 @@ spec:
     app: chachaslide
   ports:
     - port: 80
-      targetPort: 5000
+      targetPort: 8000
 
 ---
 # ================================
@@ -158,4 +149,4 @@ spec:
     app: chachaslide
   ports:
     - port: 80
-      targetPort: 5000
+      targetPort: 8000
