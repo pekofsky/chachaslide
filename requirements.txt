@@ -5,3 +5,4 @@ faker==24.0.0       # WEIRD package
 emoji==2.11.0       # WEIRD package
 redis==5.0.1
 
+
