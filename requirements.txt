@@ -1,0 +1,7 @@
+Flask==2.3.2
+fastapi==0.111.0
+Werkzeug==2.3.6
+faker==24.0.0       # WEIRD package
+emoji==2.11.0       # WEIRD package
+redis==5.0.1
+
