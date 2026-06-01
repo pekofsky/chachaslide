@@ -5,9 +5,17 @@ from rapidfuzz import process
 from pydantic import BaseModel
 from html import escape
 # import faker               # NEW weird package 1
-# import redis
+import redis
+import os
 
-
+redis_host = os.environ.get("REDIS_HOST", "redis-service")
+r = redis.Redis(
+    host=redis_host,
+    port=6379,
+    decode_responses=True,
+    socket_connect_timeout=1,
+    socket_timeout=1,
+)
 
 consultants = {
     'Sam': {'full name': 'Samuel Pekofsky', 'pod': 'Cha Cha Slide', 'rest': 1, 'cohort': 'DF14'}
@@ -76,7 +84,7 @@ def render_html_table(data) -> str:
     """
 
 
-def render_consultants_html() -> str:
+def render_consultants_html(visits: int = 0) -> str:
     table_html = render_html_table(consultants)
 
     return f"""
@@ -115,6 +123,8 @@ def render_consultants_html() -> str:
         <div class="view-switch">
             <a href="{JSON_VIEW_URL}">View as JSON</a>
         </div>
+
+        <h3>This page has {visits} visits.</h3>
     </body>
     </html>
     """
@@ -122,8 +132,15 @@ def render_consultants_html() -> str:
 
 @app.get("/")
 def home(format: str = Query("json", pattern="^(json|html)$")):
+    # Track total visits across ALL pods
+    try:
+        visits = r.incr("counter")
+    except redis.RedisError:
+        visits = 0
+    
+    
     if format == "html":
-        return HTMLResponse(content=render_consultants_html())
+        return HTMLResponse(content=render_consultants_html(visits))
 
     return consultants
     # return {
