@@ -4,5 +4,8 @@ Werkzeug==2.3.6
 faker==24.0.0       # WEIRD package
 emoji==2.11.0       # WEIRD package
 redis==5.0.1
+uvicorn==0.30.1
+rapidfuzz==3.9.3
+pydantic==2.8.2
 
 
