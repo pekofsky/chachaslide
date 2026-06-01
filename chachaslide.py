@@ -15,7 +15,7 @@ r = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
 
 app = FastAPI(title="ChaChaSlide Memory Game")
 
-MOVES = ["⬅️", "➡️", "⬆️", "⬇️"]
+MOVES = ["l", "r", "u", "d"]
 
 # -------- HEALTH --------
 @app.get("/health")
@@ -48,7 +48,7 @@ def home():
 
         <h2 id="sequence"></h2>
 
-        <input id="answer" placeholder="Enter sequence e.g. ⬅️➡️⬆️"/>
+        <input id="answer" placeholder="Enter sequence e.g. lrud"/>
         <br><br>
 
         <button onclick="submitAnswer()">Submit</button>
