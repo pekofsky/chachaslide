@@ -56,7 +56,7 @@ spec:
 
       containers:
         - name: chachaslide
-          image: kubetrain.azurecr.io/chachaslide:2.0.0
+          image: kubetrain.azurecr.io/chachaslide:3.0.0
 
           ports:
             - containerPort: 8000
