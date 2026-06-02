@@ -152,6 +152,11 @@ def home(format: str = Query("json", pattern="^(json|html)$")):
     # }
 
 
+@app.get("/health")
+def health():
+    return Response(content="OK", media_type="text/plain")
+
+
 @app.get("/{consultant}")
 def get_consultant(consultant: str, format: str = Query("json", pattern="^(json|html)$")):
     nick = consultant.capitalize()
@@ -178,17 +183,21 @@ def get_consultant(consultant: str, format: str = Query("json", pattern="^(json|
     return c
 
 
-@app.get("/health")
-def health():
-    return Response(content="OK", media_type="text/plain")
-
-
 class Consultant(BaseModel):
     nick: str
     name: str
     pod: str | None
     rest: str | int | None
     cohort: str
+
+def create_consultant_entry(consultant: Consultant):
+    info = {
+            'full name': consultant['name']
+            , 'pod': consultant['pod']
+            , 'rest': consultant['rest']
+            , 'cohort': consultant['cohort']
+    }
+    return info
 
 
 @app.post('/')
@@ -199,12 +208,7 @@ def add_consultant(consultant: Consultant):
     #     , 'b': isinstance(added_consultant, dict)
     # }
     if added_consultant['nick'] not in consultants:
-        info = {
-            'full name': added_consultant['name']
-            , 'pod': added_consultant['pod']
-            , 'rest': added_consultant['rest']
-            , 'cohort': added_consultant['cohort']
-        }
+        info = create_consultant_entry(add_consultant)
         consultants[str(added_consultant['nick'])] = info
     
         similar_name = process.extractOne(added_consultant['nick'], consultants.keys())
@@ -215,6 +219,19 @@ def add_consultant(consultant: Consultant):
         }
 
     raise HTTPException(status_code=409, detail='Consultant already exists')
+
+@app.put('/{nick}')
+def update_consultant_by_nickname(nick: str, consultant: Consultant):
+    prev = consultants[nick]
+    changed_consultant = consultant.model_dump()
+    consultants[nick] = create_consultant_entry(changed_consultant)
+    similar_name = process.extractOne(changed_consultant['nick'], consultants.keys())
+    return {
+            'updated': {changed_consultant['nick']: consultants[changed_consultant['nick']]}
+            , 'previous': {nick: prev}
+            , 'most similar nick name': similar_name[0]
+    }
+
 
 if __name__ == "__main__":
     import uvicorn
